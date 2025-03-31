@@ -1,40 +1,33 @@
+import smtplib
 from datetime import date
+from ensurepip import bootstrap
+
+from dns.reversename import to_address
 from flask import Flask, abort, render_template, redirect, url_for, flash, request
-from flask_bootstrap import Bootstrap5
+from flask_bootstrap import Bootstrap4
 from flask_ckeditor import CKEditor
 from flask_gravatar import Gravatar
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
+from pyexpat.errors import messages
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 import os
-# Optional: add contact me email functionality (Day 60)
-# import smtplib
-
-
-
-
-'''
-Make sure the required packages are installed: 
-Open the Terminal in PyCharm (bottom left). 
-
-On Windows type:
-python -m pip install -r requirements.txt
-
-On MacOS type:
-pip3 install -r requirements.txt
-
-This will install the packages from the requirements.txt for this project.
-'''
-
+import smtplib
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_KEY")
 ckeditor = CKEditor(app)
-Bootstrap5(app)
+
+
+app = Flask(__name__)
+bootstrap = Bootstrap4(app)
+
+
+
 
 
 app.config['SECRET_KEY'] = os.environ.get("CSRF_SCR")
@@ -276,9 +269,21 @@ def delete_post(post_id):
 def about():
     return render_template("about.html", current_user=current_user)
 
-
+E_MAIL=os.environ.get("E_MAIL")
+PASSWORD=os.environ.get("APP_PASS")
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
+    if request.method=="POST":
+        name=request.form.get("name")
+        email=request.form.get("email")
+        phone=request.form.get("phone")
+        message=request.form.get("message")
+        with smtplib.SMTP("smtp.gmail.com") as connection:
+            connection.starttls()
+            connection.login(user=E_MAIL,password=PASSWORD)
+            connection.sendmail(from_addr=E_MAIL,to_addrs="dbmurali1507@gmail.com",msg=f"Subject:Got message from My_Blog \n\n From:  {name.upper()},\n {message} \n\n\n CONTACT:{phone}\n{email}")
+
+
     return render_template("contact.html", current_user=current_user)
 
 @app.route("/")
@@ -286,28 +291,6 @@ def home():
     post=db.session.execute(db.select(BlogPost).order_by(BlogPost.post_id)).scalars()
 
     return render_template("index.html",post=post)
-# Optional: You can include the email sending code from Day 60:
-# DON'T put your email and password here directly! The code will be visible when you upload to Github.
-# Use environment variables instead (Day 35)
-
-# MAIL_ADDRESS = os.environ.get("EMAIL_KEY")
-# MAIL_APP_PW = os.environ.get("PASSWORD_KEY")
-
-# @app.route("/contact", methods=["GET", "POST"])
-# def contact():
-#     if request.method == "POST":
-#         data = request.form
-#         send_email(data["name"], data["email"], data["phone"], data["message"])
-#         return render_template("contact.html", msg_sent=True)
-#     return render_template("contact.html", msg_sent=False)
-#
-#
-# def send_email(name, email, phone, message):
-#     email_message = f"Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage:{message}"
-#     with smtplib.SMTP("smtp.gmail.com") as connection:
-#         connection.starttls()
-#         connection.login(MAIL_ADDRESS, MAIL_APP_PW)
-#         connection.sendmail(MAIL_ADDRESS, MAIL_APP_PW, email_message)
 
 
 if __name__ == "__main__":
