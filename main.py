@@ -18,12 +18,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_KEY")
 ckeditor = CKEditor(app)
 
-
-app = Flask(__name__)
 bootstrap = Bootstrap4(app)
-
-
-
 
 
 app.config['SECRET_KEY'] = os.environ.get("CSRF_SCR")
