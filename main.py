@@ -15,6 +15,8 @@ import os
 # import smtplib
 
 
+
+
 '''
 Make sure the required packages are installed: 
 Open the Terminal in PyCharm (bottom left). 
@@ -30,9 +32,12 @@ This will install the packages from the requirements.txt for this project.
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.environ.get("FLASK_KEY")
 ckeditor = CKEditor(app)
 Bootstrap5(app)
+
+
+app.config['SECRET_KEY'] = os.environ.get("CSRF_SCR")
 
 # Configure Flask-Login
 login_manager = LoginManager()
@@ -276,6 +281,11 @@ def about():
 def contact():
     return render_template("contact.html", current_user=current_user)
 
+@app.route("/")
+def home():
+    post=db.session.execute(db.select(BlogPost).order_by(BlogPost.post_id)).scalars()
+
+    return render_template("index.html",post=post)
 # Optional: You can include the email sending code from Day 60:
 # DON'T put your email and password here directly! The code will be visible when you upload to Github.
 # Use environment variables instead (Day 35)
