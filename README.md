@@ -8,7 +8,7 @@ A full-stack web application for sharing knowledge and updates about drones and 
 
 ---
 
-## 🧰 Features
+##  Features
 
 -  Create, edit, and delete blog posts (admin-only)
 -  Register and log in users
@@ -40,5 +40,4 @@ A full-stack web application for sharing knowledge and updates about drones and 
 - PostgreSQL used as the live database
 
 - Environment variables set securely via Render dashboard
-- 
-
+  
